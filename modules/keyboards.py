@@ -28,13 +28,12 @@ def func_kb(user_id):
     edit_btn = get_translation("edit_btn", user_id)
     lang_btn = get_translation("lang_btn", user_id)
     kb = InlineKeyboardBuilder()
-    kb.button(text=donate_btn, callback_data="donate")
     kb.button(text=edit_btn, callback_data="edit")
+    kb.button(text=donate_btn, callback_data="donate")
     kb.button(text=lang_btn, callback_data="lang")
-    kb.button(text="🤖AI", callback_data="ai")
     if str(user_id) in config.ADMIN_IDS:
         kb.button(text="⚡️Admin", callback_data="admin")
-    kb.adjust(4)
+    kb.adjust(1, 3)
     return kb.as_markup()
 
 def ai_kb(user_id):

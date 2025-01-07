@@ -18,7 +18,6 @@ from modules.states import GenAIState, IllusionAIState, EditState, SpamState, Ad
 from modules.keyboards import ban_kb, link_kb, func_kb, ai_kb, edit_kb, ai_continue, admin_kb, font_kb
 from modules.callback_data import Ban, AddText
 from modules.middleware import ExistsUserMiddleware
-from func.ai import upload_image_to_imgbb, gen_photo, gen_illusion, cut_photo
 from func.editor import liquid_rescale, bad_quality, make_sketch, make_moire, add_text_to_photo, \
     make_noise, make_bright, make_sat
 
@@ -152,72 +151,6 @@ async def add_down_text(message: Message, state: FSMContext):
     await add_text_to_photo(font, up_text, down_text, photo_link)
     msg = get_translation("result", message.from_user.id)
     await message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(message.from_user.id))
-
-# ai
-async def ai_start(message: Message):
-    msg = get_translation("choose_ai", message.from_user.id)
-    await message.answer(msg, reply_markup=ai_kb(message.from_user.id))
-
-async def ai_start_call(call: CallbackQuery):
-    await call.answer()
-    msg = get_translation("choose_ai", call.from_user.id)
-    await call.message.answer(msg, reply_markup=ai_kb(call.from_user.id))
-
-async def illusion_start(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    msg = get_translation("send_illusion", call.from_user.id)
-    await call.message.answer(msg)
-    await state.set_state(IllusionAIState.image)
-
-async def illuson_photo(message: Message, state: FSMContext):
-    file_id = await download_photo(message, message.from_user.id)
-    await message.bot.send_photo(chat_id=config.LOG_CHAT, photo=file_id, caption=f"<code>{message.from_user.id}</code> <a href='{message.from_user.url}'>{message.from_user.first_name}</a> sended", parse_mode="html", reply_markup=ban_kb(message.from_user.id))
-    msg = get_translation("gen_text", message.from_user.id)
-    await message.answer(msg, parse_mode="html")
-    await state.set_state(IllusionAIState.gen_param)
-
-async def illuson_gen(message: Message, state: FSMContext):
-    await state.clear()
-    cmd = message.text
-    await message.bot.send_message(chat_id=config.LOG_CHAT, text=f"<code>{message.from_user.id}</code> <a href='{message.from_user.url}'>{message.from_user.first_name}</a> sended\n<b>{cmd}</b>", parse_mode="html", reply_markup=ban_kb(message.from_user.id))
-    msg = get_translation("wait_ai_msg", message.from_user.id)
-    await message.answer(msg)
-    image_link = upload_image_to_imgbb(f"photos/{message.from_user.id}.jpg")
-    photo_link = await gen_illusion(image_link, cmd)
-    msg = get_translation("result", message.from_user.id)
-    await message.answer_photo(photo_link, caption=msg, reply_markup=ai_continue("illusion", message.from_user.id))
-
-async def gen_start(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    msg = get_translation("gen_text", call.from_user.id)
-    await call.message.answer(msg, parse_mode="html")
-    await state.set_state(GenAIState.gen_param)
-
-async def gen(message: Message, state: FSMContext):
-    await state.clear()
-    cmd = message.text
-    await message.bot.send_message(chat_id=config.LOG_CHAT, text=f"<code>{message.from_user.id}</code> <a href='{message.from_user.url}'>{message.from_user.first_name}</a> sended\n<b>{cmd}</b>", parse_mode="html", reply_markup=ban_kb(message.from_user.id))
-    msg = get_translation("wait_ai_msg", message.from_user.id)
-    await message.answer(msg)
-    photo_link = await gen_photo(cmd)
-    msg = get_translation("result", message.from_user.id)
-    await message.answer_photo(photo_link, caption=msg, reply_markup=ai_continue("gen", message.from_user.id))
-
-async def cutter_start(call: CallbackQuery, state: FSMContext):
-    await call.answer()
-    msg = get_translation("send_cutter", call.from_user.id)
-    await call.message.answer(msg)
-    await state.set_state(CutAIState.image)
-
-async def cutter_photo(message: Message, state: FSMContext):
-    await state.clear()
-    file_id = await download_photo(message, message.from_user.id)
-    await message.bot.send_photo(chat_id=config.LOG_CHAT, photo=file_id, caption=f"<code>{message.from_user.id}</code> <a href='{message.from_user.url}'>{message.from_user.first_name}</a> sended", parse_mode="html", reply_markup=ban_kb(message.from_user.id))
-    image_link = upload_image_to_imgbb(f"photos/{message.from_user.id}.jpg")
-    photo_link = await cut_photo(image_link, message.from_user.id)
-    msg = get_translation("result", message.from_user.id)
-    await message.answer_document(FSInputFile(photo_link), caption=msg, reply_markup=ai_continue("cutter", message.from_user.id))
-
 
 # other func
 
@@ -368,16 +301,6 @@ async def main():
     dp.callback_query.register(add_text, AddText.filter())
     dp.message.register(add_up_text, AddUpText.text)
     dp.message.register(add_down_text, AddDownText.text)
-    # ai
-    dp.message.register(ai_start, Command(commands="ai"))
-    dp.callback_query.register(ai_start_call, F.data == "ai")
-    dp.callback_query.register(gen_start, F.data == "gen")
-    dp.callback_query.register(illusion_start, F.data == "illusion")
-    dp.callback_query.register(cutter_start, F.data == "cutter")
-    dp.message.register(gen, GenAIState.gen_param)
-    dp.message.register(illuson_photo, IllusionAIState.image)
-    dp.message.register(illuson_gen, IllusionAIState.gen_param)
-    dp.message.register(cutter_photo, CutAIState.image)
     # other commands
     dp.callback_query.register(donate, F.data == "donate")
     dp.callback_query.register(ban, Ban.filter())
