@@ -23,11 +23,7 @@ Welcome to the project setup guide! Follow these steps to configure and run the 
    - Add the bot to your newly created channel.
 
 
-### 2. Creating api keys for ai
-- Get fal ai api key from https://fal.ai/dashboard/keys
-- Get imgbb token from uploading photos in https://api.imgbb.com/
-
-### 3. Configure Environment Variables
+### 2. Configure Environment Variables
 
 Add the following information to your `.env` file:
 
@@ -35,8 +31,6 @@ Add the following information to your `.env` file:
 API_TOKEN=your_telegram_bot_token
 CHANNEL=your_channel_id (ex. -100123123123) 
 LOG_CHAT=chat or channel where you can moderate content that users upload into your bot (ex. -100123123123)
-AI_GEN_API=fal ai api key
-IMGBBTOKEN=imgbb token
 CHANNEL_LINK=your_channel_link (ex. t.me/***)
 DB_PATH=db.db path to your database
 ADMIN_IDS=[123, 456](where are 123 and 456 - telegram ids of admins)
