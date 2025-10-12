@@ -25,7 +25,7 @@ from func.editor import liquid_rescale, bad_quality, make_sketch, make_moire, ad
 # start
 async def welcome(message: Message):
     start_msg = get_translation("start_msg", message.from_user.id)
-    await message.answer_photo("https://i.imgur.com/KVk8Pzq.jpeg", start_msg, reply_markup=func_kb(message.from_user.id))
+    await message.answer_photo(FSInputFile("photo.jpg"), start_msg, reply_markup=func_kb(message.from_user.id))
 
 # editor
 async def edit(message: Message, state: FSMContext):
