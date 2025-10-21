@@ -164,6 +164,20 @@ async def donate(call: CallbackQuery):
     p = InputMediaPhoto(media=file_id, caption=donate_text, parse_mode='html')
     await call.message.edit_media(media=p, reply_markup=func_kb(call.from_user.id), disable_web_page_preview=True)
 
+async def check_sub(call: CallbackQuery):
+    await call.answer()
+    try:
+        member = await call.bot.get_chat_member(chat_id=config.CHANNEL, user_id=call.from_user.id)
+        # statuses: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
+        if member.status in ('creator', 'administrator', 'member'):
+            msg = get_translation("subscribed", call.from_user.id)
+        else:
+            msg = get_translation("not_subscribed", call.from_user.id)
+    except Exception:
+        # if any error (for example bot not in channel or invalid channel id) treat as not subscribed
+        msg = get_translation("not_subscribed", call.from_user.id)
+    await call.message.answer(msg)
+
 async def download_photo(message, user_id):
     photo_link = f"photos/{user_id}.jpg"
     file_info = await message.bot.get_file(message.photo[-1].file_id)
@@ -303,6 +317,7 @@ async def main():
     dp.message.register(add_down_text, AddDownText.text)
     # other commands
     dp.callback_query.register(donate, F.data == "donate")
+    dp.callback_query.register(check_sub, F.data == "check_sub")
     dp.callback_query.register(ban, Ban.filter())
     print("Bot started")
     await dp.start_polling(bot)

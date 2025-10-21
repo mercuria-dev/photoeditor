@@ -18,9 +18,12 @@ def admin_kb():
 
 def link_kb(user_id):
     text = get_translation("sub_btn", user_id)
+    check_btn = get_translation("check_sub_btn", user_id)
     kb = InlineKeyboardBuilder()
     kb.button(text=text, url=config.CHANNEL_LINK)
-    kb.adjust(1)
+    kb.button(text=check_btn, callback_data="check_sub")
+    # first row - link, second row - check subscription
+    kb.adjust(1, 1)
     return kb.as_markup()
 
 def func_kb(user_id):
