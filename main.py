@@ -2,6 +2,9 @@ import asyncio
 from PIL import Image
 import config
 from modules.lang import get_translation
+import shutil
+from datetime import datetime, timezone, timedelta
+import os
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -285,6 +288,19 @@ async def send_spam(message: Message, state: FSMContext):
                 pass
     await message.answer("✅Finished")
 
+async def send_db(bot):
+    msk_tz = timezone(timedelta(hours=3))
+    now = datetime.now(msk_tz)
+    filename = f"db_{now.strftime('%Y-%m-%d_%H-%M')}_MSK.db"
+    shutil.copy("base/db.db", filename)
+    await bot.send_document(chat_id=config.LOG_CHAT, document=FSInputFile(filename), caption=f"Database backup: {filename}")
+    os.remove(filename)
+
+async def scheduler(bot):
+    while True:
+        await send_db(bot)
+        await asyncio.sleep(10800)  # 3 hours in seconds
+
 async def main():
     bot_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
     bot = Bot(token=config.API_TOKEN, default=bot_properties)
@@ -320,6 +336,7 @@ async def main():
     dp.callback_query.register(check_sub, F.data == "check_sub")
     dp.callback_query.register(ban, Ban.filter())
     print("Bot started")
+    asyncio.create_task(scheduler(bot))
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
