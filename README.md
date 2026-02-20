@@ -34,6 +34,7 @@ LOG_CHAT=chat or channel where you can moderate content that users upload into y
 CHANNEL_LINK=your_channel_link (ex. t.me/***)
 DB_PATH=db.db path to your database
 ADMIN_IDS=[123, 456](where are 123 and 456 - telegram ids of admins)
+CRYPTOBOT_INVOICE_URL=cryptobot invoice/start link (ex. https://t.me/send?start=...)
 ```
 
 ## Setup Instructions

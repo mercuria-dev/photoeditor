@@ -1,7 +1,8 @@
 import asyncio
+import html
 from PIL import Image
 import config
-from modules.lang import get_translation
+from modules.lang import get_translation, get_translation_parsed
 import shutil
 from datetime import datetime, timezone, timedelta
 import os
@@ -27,19 +28,25 @@ from func.editor import liquid_rescale, bad_quality, make_sketch, make_moire, ad
 
 # start
 async def welcome(message: Message):
-    start_msg = get_translation("start_msg", message.from_user.id)
-    await message.answer_photo(FSInputFile("photo.jpg"), start_msg, reply_markup=func_kb(message.from_user.id))
+    start_msg, start_entities = get_translation_parsed("start_msg", message.from_user.id)
+    await message.answer_photo(
+        photo=FSInputFile("photo.jpg"),
+        caption=start_msg,
+        caption_entities=start_entities,
+        parse_mode=None,
+        reply_markup=func_kb(message.from_user.id),
+    )
 
 # editor
 async def edit(message: Message, state: FSMContext):
-    msg = get_translation("send_to_edit", message.from_user.id)
-    await message.answer(msg)
+    msg, entities = get_translation_parsed("send_to_edit", message.from_user.id)
+    await message.answer(msg, entities=entities, parse_mode=None)
     await state.set_state(EditState.get_photo)
 
 async def edit_call(call: CallbackQuery, state: FSMContext):
     await call.answer()
-    msg = get_translation("send_to_edit", call.from_user.id)
-    await call.message.answer(msg)
+    msg, entities = get_translation_parsed("send_to_edit", call.from_user.id)
+    await call.message.answer(msg, entities=entities, parse_mode=None)
     await state.set_state(EditState.get_photo)
 
 async def photo(message: Message, state: FSMContext):
@@ -58,77 +65,131 @@ async def photo(message: Message, state: FSMContext):
             height = (height//4)*3
         im = im.resize((width, height))
         im.save(photo_link)
-        msg = get_translation("menu", message.from_user.id)
-        await message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(message.from_user.id))
+        msg, msg_entities = get_translation_parsed("menu", message.from_user.id)
+        await message.answer_photo(
+            photo=FSInputFile(photo_link),
+            caption=msg,
+            caption_entities=msg_entities,
+            parse_mode=None,
+            reply_markup=edit_kb(message.from_user.id),
+        )
 
 async def jm(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await liquid_rescale(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def call_bad_quality(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await bad_quality(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def sketch(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await make_sketch(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def moire(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await make_moire(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def noise(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await make_noise(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def bright(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await make_bright(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def sat(call: CallbackQuery):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     photo_link = f"photos/{call.from_user.id}.jpg"
     await make_sat(photo_link)
-    msg = get_translation("result", call.from_user.id)
-    await call.message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(call.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", call.from_user.id)
+    await call.message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(call.from_user.id),
+    )
 
 async def choose_font(call: CallbackQuery):
     await call.answer()
-    msg = get_translation("choose_font", call.from_user.id)
+    msg, msg_entities = get_translation_parsed("choose_font", call.from_user.id)
     file_id = await download_photo(call.message, call.from_user.id)
-    await call.message.answer_photo(photo=file_id, caption=msg, reply_markup=font_kb())
+    await call.message.answer_photo(
+        photo=file_id,
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=font_kb(),
+    )
 
 async def add_text(call: CallbackQuery, callback_data: dict, state: FSMContext):
     await call.answer()
     await download_photo(call.message, call.from_user.id)
     await state.update_data(font=callback_data.font)
-    msg = get_translation("add_up_text", call.from_user.id)
-    await call.message.answer(msg)
+    msg, msg_entities = get_translation_parsed("add_up_text", call.from_user.id)
+    await call.message.answer(msg, entities=msg_entities, parse_mode=None)
     await state.set_state(AddUpText.text)
 
 async def add_up_text(message: Message, state: FSMContext):
@@ -137,8 +198,8 @@ async def add_up_text(message: Message, state: FSMContext):
     else:
         up_text = message.text
     await state.update_data(up_text=up_text)
-    msg = get_translation("add_down_text", message.from_user.id)
-    await message.answer(msg)
+    msg, msg_entities = get_translation_parsed("add_down_text", message.from_user.id)
+    await message.answer(msg, entities=msg_entities, parse_mode=None)
     await state.set_state(AddDownText.text)
 
 async def add_down_text(message: Message, state: FSMContext):
@@ -152,18 +213,29 @@ async def add_down_text(message: Message, state: FSMContext):
         down_text = message.text
     photo_link = f"photos/{message.from_user.id}.jpg"
     await add_text_to_photo(font, up_text, down_text, photo_link)
-    msg = get_translation("result", message.from_user.id)
-    await message.answer_photo(FSInputFile(photo_link), msg, reply_markup=edit_kb(message.from_user.id))
+    msg, msg_entities = get_translation_parsed("result", message.from_user.id)
+    await message.answer_photo(
+        photo=FSInputFile(photo_link),
+        caption=msg,
+        caption_entities=msg_entities,
+        parse_mode=None,
+        reply_markup=edit_kb(message.from_user.id),
+    )
 
 # other func
 
 async def donate(call: CallbackQuery):
     await call.answer()
     file_id = await download_photo(call.message, call.from_user.id)
-    msg = get_translation("donate", call.from_user.id)
+    msg, _msg_entities = get_translation_parsed("donate", call.from_user.id)
     donate_text = f"🖤{msg}:\n"
-    with open("donate.txt", "rt", encoding="utf-8") as d:
-        donate_text += d.read()
+
+    cryptobot_url = config.CRYPTOBOT_INVOICE_URL
+    if cryptobot_url:
+        cryptobot_url = html.escape(cryptobot_url, quote=True)
+        donate_text += f"Crypto Bot <a href=\"{cryptobot_url}\">send</a>"
+    else:
+        donate_text += "Crypto Bot: <code>CRYPTOBOT_INVOICE_URL</code> is not set"
     p = InputMediaPhoto(media=file_id, caption=donate_text, parse_mode='html')
     await call.message.edit_media(media=p, reply_markup=func_kb(call.from_user.id), disable_web_page_preview=True)
 
@@ -173,13 +245,13 @@ async def check_sub(call: CallbackQuery):
         member = await call.bot.get_chat_member(chat_id=config.CHANNEL, user_id=call.from_user.id)
         # statuses: 'creator', 'administrator', 'member', 'restricted', 'left', 'kicked'
         if member.status in ('creator', 'administrator', 'member'):
-            msg = get_translation("subscribed", call.from_user.id)
+            msg, msg_entities = get_translation_parsed("subscribed", call.from_user.id)
         else:
-            msg = get_translation("not_subscribed", call.from_user.id)
+            msg, msg_entities = get_translation_parsed("not_subscribed", call.from_user.id)
     except Exception:
         # if any error (for example bot not in channel or invalid channel id) treat as not subscribed
-        msg = get_translation("not_subscribed", call.from_user.id)
-    await call.message.answer(msg)
+        msg, msg_entities = get_translation_parsed("not_subscribed", call.from_user.id)
+    await call.message.answer(msg, entities=msg_entities, parse_mode=None)
 
 async def download_photo(message, user_id):
     photo_link = f"photos/{user_id}.jpg"

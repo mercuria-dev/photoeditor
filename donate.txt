@@ -1,7 +1,0 @@
-BTC
-<code>bc1qhpegcfz6ynmksff95wj9e4kva89d95syyqk3l4</code>
-TRON / USDT trc 20
-<code>TRJxipxAswjj9A7RuvUFx1ShfmZ3JLhi2r</code>
-TON / USDT TON
-<code>UQCwp7u30xT9gmWfcruTP45gLlG66fi1ySGthYcasAss08ZU</code>
-Crypto Bot <a href="https://t.me/send?start=IVaKdZoKNKDe">send</a>

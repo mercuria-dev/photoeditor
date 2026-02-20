@@ -2,7 +2,7 @@
 from aiogram import BaseMiddleware
 from modules import database
 from modules.keyboards import ban_kb, link_kb
-from modules.lang import get_translation
+from modules.lang import get_translation_parsed
 import config
 
 
@@ -19,10 +19,12 @@ class ExistsUserMiddleware(BaseMiddleware):
         if user_status.status != "left":
             return await handler(event, data)
         else:
-            msg = get_translation("sub_msg", user.id)
+            msg, msg_entities = get_translation_parsed("sub_msg", user.id)
             await event.bot.send_message(
                 chat_id=user.id,
                 text=msg,
+                entities=msg_entities,
+                parse_mode=None,
                 reply_markup=link_kb(user.id)
             )
             return
