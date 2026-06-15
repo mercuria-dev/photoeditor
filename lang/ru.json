@@ -1,5 +1,5 @@
 {
-    "start_msg": "<tg-emoji emoji-id=\"5469947168523558652\">☀️</tg-emoji>Бот отредактирует ваше фото, используя магические функции. Выбирайте, что вам нужно\n<a href='https://github.com/mercury-devel/photoeditor'>Исходный код проекта</a>",
+    "start_msg": "<tg-emoji emoji-id=\"5469947168523558652\">☀️</tg-emoji>Бот отредактирует ваше фото, используя магические функции. Выбирайте, что вам нужно\n<a href='https://github.com/mercuria-dev/photoeditor'>Исходный код проекта</a>",
     "send_to_edit": "<tg-emoji emoji-id=\"5375074927252621134\">🖼</tg-emoji>Отправьте фото для редактирования",
     "menu": "<tg-emoji emoji-id=\"5334882760735598374\">📝</tg-emoji>Меню:",
     "result": "<tg-emoji emoji-id=\"5449505950283078474\">❤️</tg-emoji>Результат",
